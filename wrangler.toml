@@ -1,9 +1,9 @@
 name = "thesisengine-scheduler"
-main = "workers/scheduled.ts"
+main = "dist/_worker.js/scheduled-entry.js"
 compatibility_date = "2026-06-24"
 
 kv_namespaces = [
-  { binding = "SIGNAL_KV", id = "replace-with-kv-id" }
+  { binding = "SIGNAL_KV", id = "2759909d5f2f41c686d0a596e26e7400" }
 ]
 
 [triggers]

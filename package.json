@@ -6,6 +6,9 @@
     "dev": "nuxt dev",
     "lint": "nuxi prepare && vue-tsc --noEmit -p tsconfig.json",
     "build": "nuxt build",
+    "postbuild": "node scripts/write-worker-entry.mjs",
+    "deploy:pages": "wrangler pages deploy dist --project-name signallab",
+    "deploy:scheduler": "wrangler deploy --config wrangler.toml",
     "preview": "nuxt preview",
     "smoke": "node scripts/smoke.mjs",
     "typecheck": "nuxt typecheck"
