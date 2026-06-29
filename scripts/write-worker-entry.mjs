@@ -15,6 +15,7 @@ const wranglerConfig = readWranglerConfig(wranglerToml)
 await mkdir('dist/_worker.js', { recursive: true })
 await writeFile('dist/_worker.js/scheduled-entry.js', entry)
 await writeFile('dist/_worker.js/wrangler.json', `${JSON.stringify(wranglerConfig, null, 2)}\n`)
+await writeFile('dist/.assetsignore', '_worker.js\nnitro.json\n')
 
 function readWranglerConfig(toml) {
   const kvId = matchRequired(toml, /binding\s*=\s*"SIGNAL_KV"\s*,\s*id\s*=\s*"([^"]+)"/, 'SIGNAL_KV namespace id')
@@ -32,6 +33,11 @@ function readWranglerConfig(toml) {
     ],
     triggers: {
       crons: crons.length ? crons : ['*/15 * * * *']
+    },
+    assets: {
+      directory: '..',
+      not_found_handling: 'none',
+      run_worker_first: ['/', '/api/*']
     },
     vars
   }
