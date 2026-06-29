@@ -26,6 +26,7 @@ function readWranglerConfig(toml) {
     name: matchRequired(toml, /^name\s*=\s*"([^"]+)"/m, 'worker name'),
     main: 'scheduled-entry.js',
     compatibility_date: matchRequired(toml, /^compatibility_date\s*=\s*"([^"]+)"/m, 'compatibility date'),
+    compatibility_flags: readArray(toml, 'compatibility_flags'),
     kv_namespaces: [
       { binding: 'SIGNAL_KV', id: kvId }
     ],
@@ -40,4 +41,10 @@ function matchRequired(value, pattern, label) {
   const match = value.match(pattern)
   if (!match?.[1]) throw new Error(`Missing ${label} in wrangler.toml`)
   return match[1]
+}
+
+function readArray(toml, key) {
+  const match = toml.match(new RegExp(`^${key}\\s*=\\s*\\[([^\\]]*)\\]`, 'm'))
+  if (!match?.[1]) return []
+  return Array.from(match[1].matchAll(/"([^"]+)"/g)).map((item) => item[1])
 }
