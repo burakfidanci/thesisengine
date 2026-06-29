@@ -2,7 +2,7 @@ const baseUrl = process.env.SMOKE_BASE_URL
 const requireSignal = process.env.SMOKE_REQUIRE_SIGNAL !== 'false'
 
 if (!baseUrl) {
-  console.error('SMOKE_BASE_URL is required. Example: SMOKE_BASE_URL=https://signallab.pages.dev npm run smoke')
+  console.error('SMOKE_BASE_URL is required. Example: SMOKE_BASE_URL=https://thesisengine-scheduler.kburakfidanci.workers.dev npm run smoke')
   process.exit(1)
 }
 

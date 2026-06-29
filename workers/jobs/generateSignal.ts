@@ -167,7 +167,7 @@ async function fetchYahooChart(symbol: string, interval: string, range: string):
 }
 
 async function fetchNewsEvidence(symbol: string, env: Env): Promise<EvidenceItem[]> {
-  const rssUrl = env.GOOGLE_NEWS_RSS_URL ?? `https://news.google.com/rss/search?q=${encodeURIComponent(symbol)}`
+  const rssUrl = env.GOOGLE_NEWS_RSS_URL ?? `https://news.google.com/rss/search?q=${encodeURIComponent(symbol)}&hl=tr&gl=TR&ceid=TR:tr`
   const response = await fetch(rssUrl)
   if (!response.ok) return []
   const xml = await response.text()
@@ -202,7 +202,7 @@ async function classifyText(text: string, env: Env) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+      model: env.OPENAI_MODEL ?? 'gpt-5-mini',
       input: `Classify this BIST financial text for research only. Do not predict price. Return JSON with relevance,event_type,sentiment,impact,novelty,time_sensitivity,confidence,reason.\n\n${text}`
     })
   })
