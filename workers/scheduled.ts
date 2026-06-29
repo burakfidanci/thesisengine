@@ -16,6 +16,18 @@ export interface Env {
 }
 
 export default {
+  async fetch(request: Request, env: Env) {
+    const url = new URL(request.url)
+    if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/api/health')) {
+      return Response.json(workerHealth(env))
+    }
+
+    return Response.json({
+      status: 'not_found',
+      message: 'This is the scheduled SignalLab Worker. Dashboard routes are served by the Cloudflare Pages deployment.'
+    }, { status: 404 })
+  },
+
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     ctx.waitUntil(runScheduled(env))
   }
@@ -29,4 +41,30 @@ async function runScheduled(env: Env) {
   const generated = await generateSignal(symbol, env)
   await saveSignal(env.SIGNAL_KV, generated.signal)
   await saveEvidence(env.SIGNAL_KV, symbol, generated.evidence)
+}
+
+function workerHealth(env: Env) {
+  const providers = {
+    kv: env.SIGNAL_KV ? 'configured' : 'unavailable',
+    price_volume: env.SYMBOL_YAHOO ? 'delayed public chart source configured' : 'unavailable',
+    technical: env.SYMBOL_YAHOO ? 'derived from delayed price/volume' : 'insufficient',
+    market_context: env.XU100_SYMBOL ? 'delayed public chart source configured' : 'unavailable',
+    news: env.GOOGLE_NEWS_RSS_URL ? 'rss configured' : 'unavailable',
+    kap: 'unavailable',
+    order_flow: env.ORDER_FLOW_ENABLED === 'true' ? 'configured' : 'unavailable',
+    openai_classifier: env.OPENAI_API_KEY ? 'configured' : 'unavailable'
+  }
+
+  return {
+    service: 'thesisengine-scheduler',
+    status: providers.kv === 'configured' ? 'ok' : 'degraded',
+    kv: providers.kv,
+    providers,
+    warnings: [
+      'This Worker handles scheduled signal generation. The Nuxt dashboard and history APIs are served by Cloudflare Pages.',
+      providers.kap === 'unavailable' ? 'KAP ingestion is not connected; KAP is not counted as real evidence.' : '',
+      providers.order_flow === 'unavailable' ? 'Order-flow is unavailable; configured active weights redistribute its share.' : '',
+      providers.openai_classifier === 'unavailable' ? 'OpenAI classifier is unavailable; text classification uses fallback labels only.' : ''
+    ].filter(Boolean)
+  }
 }
